@@ -1,0 +1,32 @@
+# This file describes the services that will be deployed on Koyeb.
+# See https://www.koyeb.com/docs/apps/services/koyeb-yaml for more details.
+
+name: boomfare-messenger-server
+services:
+  - name: app
+    # You can find all the available instance types on https://www.koyeb.com/pricing
+    instance_type: free
+    # The list of ports your service will listen to.
+    ports:
+      - port: 3000
+        protocol: HTTP
+    # The list of routes your service will respond to.
+    # Here, we route all traffic from the root path to the port 3000.
+    routes:
+      - path: /
+        port: 3000
+    # Here, we configure the health check for the service.
+    # Koyeb will send a GET request to /health on port 3000 every 10s.
+    # If the service does not respond with a 2xx status code 3 times in a row, it will be restarted.
+    health_checks:
+      - http:
+          path: /health
+          port: 3000
+          interval: 10s
+          timeout: 5s
+          success_threshold: 1
+          failure_threshold: 3
+    # The build configuration for the service.
+    # Here, we use the Dockerfile present in the repository.
+    docker:
+      dockerfile: Dockerfile

@@ -1,20 +1,29 @@
-# Use Node.js 18
+# Use Node.js 18 as the base image
 FROM node:18-slim
 
-# Create app directory
+# Create a non-root user and group for security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 node
+
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy package files and install dependencies
+# Use --chown to set ownership to the new user immediately
+COPY --chown=node:nodejs package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install only production dependencies using npm ci for reliability
+RUN npm ci --only=production
 
-# Copy source code
-COPY . .
+# Copy the rest of the application source code
+COPY --chown=node:nodejs . .
 
-# Expose the port
+# Switch to the non-root user
+USER node
+
+# Expose the port the app will run on.
+# Koyeb automatically maps this to 80/443.
 EXPOSE 3000
 
-# Start the server
+# The command to start the app
 CMD [ "npm", "start" ]
