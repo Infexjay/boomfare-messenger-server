@@ -7,10 +7,19 @@ require('dotenv').config();
 const app = express();
 app.use(cors());
 
+// ✅ Add a healthcheck route so Koyeb go fit ping
+app.get('/', (req, res) => {
+  res.send('Server is running 🚀');
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // In production, replace with your app's domain
+    origin: "*", // change this later to your frontend URL
     methods: ["GET", "POST"]
   }
 });
